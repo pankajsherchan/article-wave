@@ -10,7 +10,7 @@ def crawl_article(link: str) -> None:
 
     article = crawler.extract(link)
 
-    pprint(article.model_dump())
+    # pprint(article.model_dump())
 
 
 def main() -> None:
