@@ -7,6 +7,11 @@ class Settings(BaseSettings):
         "?replicaSet=my-replica-set"
     )
     MONGO_DATABASE_NAME: str = "article_wave"
+    RABBITMQ_HOST: str = "localhost"
+    RABBITMQ_PORT: int = 5673
+    RABBITMQ_DEFAULT_USERNAME: str = "guest"
+    RABBITMQ_DEFAULT_PASSWORD: str = "guest"
+    RABBITMQ_QUEUE_NAME: str = "article_events"
 
     model_config = SettingsConfigDict(
         env_file=".env",
