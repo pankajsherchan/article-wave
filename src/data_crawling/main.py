@@ -1,5 +1,4 @@
 import argparse
-from pprint import pprint
 
 from data_crawling.dispatcher import CrawlerDispatcher
 
@@ -10,7 +9,13 @@ def crawl_article(link: str) -> None:
 
     article = crawler.extract(link)
 
-    # pprint(article.model_dump())
+    print(
+        "Crawled article: "
+        f"title={article.title!r}, "
+        f"platform={article.platform!r}, "
+        f"canonical_url={article.canonical_url!r}, "
+        f"id={article.id}"
+    )
 
 
 def main() -> None:

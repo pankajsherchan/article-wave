@@ -44,7 +44,18 @@ services:
       - ./rabbitmq/log/:/var/log/rabbitmq
     restart: always
 
+  qdrant: 
+    image: qdrant/qdrant:v1.12.5
+    container_name: article-wave-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    restart: always
+
 volumes:
   mongo-replica-1-data:
   mongo-replica-2-data:
   mongo-replica-3-data:
+  qdrant-data:
