@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     CHUNK_OVERLAP: int = 50
     EMBEDDING_MODEL_MAX_INPUT_LENGTH: int = 256
 
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL_ID: str = "qwen3.5:9b"
+
+    MIN_RETRIEVAL_SCORE: float = 0.2
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

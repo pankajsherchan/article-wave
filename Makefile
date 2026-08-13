@@ -1,4 +1,4 @@
-.PHONY: local-start local-stop local-crawl-article local-crawl-links local-cdc local-feature-pipeline
+.PHONY: local-start local-stop local-crawl-article local-crawl-links local-cdc local-feature-pipeline local-ask
 
 local-start:
 	docker compose up -d
@@ -22,3 +22,7 @@ local-cdc:
 
 local-feature-pipeline:
 	uv run python -m bytewax.run src/feature_pipeline/main.py
+
+
+local-ask:
+	uv run python -m inference_pipeline.main "$(QUESTION)"
