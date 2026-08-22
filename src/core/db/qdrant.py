@@ -38,3 +38,26 @@ class QdrantDatabaseConnector:
             collection_name=settings.QDRANT_COLLECTION_NAME,
             points_selector=points_filter,
         )
+
+    def search(self, query_vector: list[float], limit: int = 5):
+        self.ensure_collection()
+
+        response = self.client.query_points(
+            collection_name=settings.QDRANT_COLLECTION_NAME,
+            query=query_vector,
+            limit=limit,
+            with_payload=True,
+            with_vectors=False,
+        )
+
+        return response.points
+
+    def scroll(self, collection_name: str | None = None, limit: int = 10000):
+        self.ensure_collection()
+
+        return self.client.scroll(
+            collection_name=collection_name or settings.QDRANT_COLLECTION_NAME,
+            limit=limit,
+            with_payload=True,
+            with_vectors=False,
+        )

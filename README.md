@@ -15,7 +15,7 @@ email, private profiles, or author-imitation data.
 
 ## Current Status
 
-Phase 3, **Sync / CDC**, is complete. Phase 4 indexing is next.
+Phase 5, **Retrieval**, is complete. Phase 6 behavior decisions are next.
 
 Implemented so far:
 
@@ -31,10 +31,14 @@ Implemented so far:
 - RabbitMQ service for local event transport
 - Article CDC events for create, update, and delete changes
 - Compact CDC terminal summaries while full event payloads are queued
+- Bytewax feature pipeline for cleaning, chunking, embedding, and indexing article chunks
+- Local Qdrant `article_chunks` collection with citeable source metadata
+- Inference pipeline for retrieval, grounded prompting, local Ollama generation, and cited answers
+- Unsupported-question handling based on retrieval confidence
 
 Next implementation phase:
 
-- Phase 4, **Indexing**, to consume article events and build citeable chunks.
+- Phase 6, **Behavior**, to decide whether fine-tuning or dataset generation is useful for stable answer style.
 
 ## Course-To-Project Skill Map
 
@@ -47,8 +51,8 @@ Next implementation phase:
 | Source metadata preservation | Store URL, canonical URL, platform, title, author, publication, publish date, content hash, and ingestion time. | Implemented |
 | Deduplication strategy | Use canonical URL and content hash to avoid duplicate or stale article records. | Implemented |
 | Change data capture | Model `article.created`, `article.updated`, and `article.deleted` events for downstream cleanup. | Implemented |
-| Text cleaning and chunking | Convert article text into citeable chunks with source metadata. | Planned |
-| Vector search / RAG | Retrieve article chunks and answer questions with citations. | Planned |
+| Text cleaning and chunking | Convert article text into citeable chunks with source metadata. | Complete |
+| Vector search / RAG | Retrieve article chunks and answer questions with citations. | Complete |
 | Evaluation | Test direct questions, cross-article synthesis, filters, and unsupported questions. | Planned |
 | Product scoping | Adapt a broad reference architecture into a focused Article Wave MVP. | Ongoing |
 
@@ -62,15 +66,37 @@ Next implementation phase:
 | trafilatura | Extracts readable article text and metadata from HTML. | Declared for Phase 2 |
 | uv | Manages Python dependencies and lockfile. | Active |
 | RabbitMQ | Carries article CDC events from sync into the feature pipeline. | Active |
+| Qdrant | Stores embedded article chunks for local vector search. | Active |
+| SentenceTransformers | Embeds article chunks and user questions with the same local model. | Active |
+| Ollama | Runs the local open-weight generation model for cited RAG answers. | Active |
+| qwen3.5:9b | Local Ollama model currently used for Phase 5 answer generation. | Active |
 | Git | Tracks project history and implementation progress. | Active |
 | VS Code | Development environment, configured to hide generated Python cache/build files. | Active |
 
 Potential later packages will be chosen when their phase begins:
 
-- local storage or database package for article persistence;
-- vector database or local vector index for searchable chunks;
 - embedding model/provider for retrieval;
 - evaluation tooling for RAG quality checks.
+
+## Local Inference
+
+Phase 5 uses Ollama for local answer generation.
+
+Install the current model:
+
+```bash
+ollama pull qwen3.5:9b
+```
+
+Make sure Ollama is running, then ask indexed articles a question:
+
+```bash
+uv run python -m inference_pipeline.main "How can AI help engineers with documentation?"
+```
+
+The inference CLI retrieves article chunks from Qdrant, builds a grounded prompt,
+generates an answer with Ollama, and prints numbered sources that match the
+answer citations.
 
 ## Architecture Direction
 
@@ -120,9 +146,9 @@ Out of scope:
 | --- | --- |
 | Phase 2: Ingestion | Medium/Substack URLs become normalized article records. Complete. |
 | Phase 3: Sync | Article create/update/delete events prevent stale downstream data. Complete. |
-| Phase 4: Indexing | Articles become searchable citeable chunks. Current. |
-| Phase 5: Retrieval | Questions are answered from article evidence with citations. |
-| Phase 6: Behavior | Decide whether fine-tuning is useful for stable answer style. |
+| Phase 4: Indexing | Articles become searchable citeable chunks. Complete. |
+| Phase 5: Retrieval | Questions are answered from article evidence with citations. Complete. |
+| Phase 6: Behavior | Decide whether fine-tuning is useful for stable answer style. Current. |
 | Phase 7: Evaluation | Make retrieval and answer quality visible through test cases. |
 | Phase 8: Optional Refactor | Compare alternate indexing approaches only after the MVP works. |
 
