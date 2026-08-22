@@ -51,3 +51,13 @@ class QdrantDatabaseConnector:
         )
 
         return response.points
+
+    def scroll(self, collection_name: str | None = None, limit: int = 10000):
+        self.ensure_collection()
+
+        return self.client.scroll(
+            collection_name=collection_name or settings.QDRANT_COLLECTION_NAME,
+            limit=limit,
+            with_payload=True,
+            with_vectors=False,
+        )

@@ -154,6 +154,30 @@ Verified:
 - cross-article synthesis question;
 - unsupported question.
 
+Phase 6 handoff finding:
+
+- After indexing both `The AI-Native Software Engineer` and `Prompt engineering
+  with Retrieval Augmented Generation systems - tread with caution!`, direct
+  single-article questions worked for each article.
+- The cross-article comparison question retrieved only chunks from `The
+  AI-Native Software Engineer`, even though the second article was present in
+  Qdrant.
+- Increasing the retrieval limit changed the result: the comparison answer
+  included evidence from both articles, with three chunks from Addy Osmani's
+  article and one chunk from Aaron Tay's article. This showed the second article
+  was searchable, but lower-ranked for the broad comparison query.
+- This points first to a retrieval behavior issue rather than a fine-tuning
+  need. Before using model tuning to fix answer behavior, test retrieval
+  diversity, higher retrieval limits, query wording, metadata filters, or hybrid
+  search.
+- One run of the cross-article question printed sources but no answer text,
+  which suggests a separate generation stability issue: Ollama may have returned
+  an empty response, or the response was stripped to an empty string.
+- For learning, Phase 6 will still replicate the LLM Twin course path:
+  generate an Article Wave instruction dataset and use it to understand the
+  fine-tuning workflow. Product improvements can then build on top of that
+  learning if evaluation shows a real need.
+
 ## MVP Done
 
 Article Wave MVP is done when:

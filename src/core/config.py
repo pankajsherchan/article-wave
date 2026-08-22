@@ -25,7 +25,15 @@ class Settings(BaseSettings):
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     OLLAMA_MODEL_ID: str = "qwen3.5:9b"
 
+    OPENAI_API_KEY: str | None = None
+    OPENAI_MODEL_ID: str = "gpt-4o-mini"
+
+    COMET_API_KEY: str | None = None
+    COMET_WORKSPACE: str | None = None
+    COMET_PROJECT: str = "article-wave"
+
     MIN_RETRIEVAL_SCORE: float = 0.2
+
 
     model_config = SettingsConfigDict(
         env_file=".env",
