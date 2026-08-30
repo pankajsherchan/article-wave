@@ -1,4 +1,4 @@
-.PHONY: local-start local-stop local-crawl-article local-crawl-links local-cdc local-feature-pipeline local-ask local-generate-instruct-dataset
+.PHONY: local-start local-stop local-crawl-article local-crawl-links local-cdc local-feature-pipeline local-ask local-generate-instruct-dataset evaluate-llm evaluate-rag evaluate-llm-monitoring
 
 PROMPT ?= Write a paragraph to introduce supervised fine-tuning.
 
@@ -42,3 +42,12 @@ start-training-pipeline:
 
 local-test-sagemaker-artifact:
 	uv run python -m training_pipeline.infer_sagemaker_artifact --prompt "$(PROMPT)"
+
+evaluate-llm:
+	uv run python -m inference_pipeline.evaluation.evaluate
+
+evaluate-rag:
+	uv run python -m inference_pipeline.evaluation.evaluate_rag
+
+evaluate-llm-monitoring:
+	uv run python -m inference_pipeline.evaluation.evaluate_monitoring
