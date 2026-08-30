@@ -79,7 +79,7 @@ the product.
 
 ## Progress Tracker
 
-Current phase: **Phase 6 — Behavior**.
+Current phase: **Phase 8 — Optional Refactor**.
 
 | Phase | Status | Notes |
 | --- | --- | --- |
@@ -87,9 +87,9 @@ Current phase: **Phase 6 — Behavior**.
 | Phase 3 — Sync | Complete | MongoDB CDC emits `article.created`, `article.updated`, and `article.deleted` events to RabbitMQ. Created/updated events include article payloads; deleted events identify the article for downstream cleanup. |
 | Phase 4 — Indexing | Complete | Bytewax consumes RabbitMQ article events, cleans article text, chunks it with course-style LangChain splitters, embeds chunks with a cached SentenceTransformer model, and writes citeable chunk metadata to local Qdrant `article_chunks`. Stale chunks are removed for `article.updated` and `article.deleted`. Local create flow was verified end to end: MongoDB -> CDC -> RabbitMQ -> feature pipeline -> Qdrant. |
 | Phase 5 — Retrieval | Complete | Article Wave retrieves Qdrant article chunks, builds grounded prompts, generates local Ollama answers, cites sources, handles unsupported questions, and passes direct, cross-article synthesis, and unsupported-question tests. |
-| Phase 6 — Behavior | Current | Decide whether fine-tuning/dataset generation is useful for stable answer style. |
-| Phase 7 — Evaluation | Not started | Define direct, synthesis, filter, and unsupported-question evaluation cases. |
-| Phase 8 — Optional Refactor | Not started | Compare alternate retrieval/indexing designs only after the basic MVP works. |
+| Phase 6 — Behavior | Complete | Generated an Article Wave instruction dataset from indexed article chunks, logged it as a Comet artifact, added a course-aligned training pipeline, and used the phase to learn the LLM Twin fine-tuning workflow. Product findings still point first to retrieval behavior before model tuning. |
+| Phase 7 — Evaluation | Complete | Added an LLM Twin-style Opik/Comet evaluation package with RAG evaluation, a custom Article Wave style metric, placeholder non-RAG and monitoring evaluators, and Makefile targets. Verified `make evaluate-rag` with one sample from `articles-instruct-dataset`: hallucination 0.0, context recall 0.54, context precision 0.60. Full multi-sample local eval is deferred because threaded evaluation caused native crash risk. |
+| Phase 8 — Optional Refactor | Current | Compare alternate retrieval/indexing designs only after the basic MVP works. |
 
 ## Phase 4 — Indexing Summary
 
@@ -177,6 +177,51 @@ Phase 6 handoff finding:
   generate an Article Wave instruction dataset and use it to understand the
   fine-tuning workflow. Product improvements can then build on top of that
   learning if evaluation shows a real need.
+
+## Phase 7 — Evaluation
+
+Goal: evaluate Article Wave with the same Opik/Comet workflow used by LLM Twin.
+
+Implemented:
+
+- Phase 7 plan in `docs/phase-7-evaluation-plan.md`;
+- `src/core/opik_utils.py` for Opik configuration and Comet artifact to Opik
+  dataset creation;
+- `src/inference_pipeline/evaluation/evaluate_rag.py` for RAG evaluation;
+- `src/inference_pipeline/evaluation/style.py` for Article Wave answer-style
+  judging;
+- placeholder `evaluate.py` and `evaluate_monitoring.py` to preserve the LLM
+  Twin structure until non-RAG generation and Opik trace monitoring are added;
+- Makefile targets for `evaluate-llm`, `evaluate-rag`, and
+  `evaluate-llm-monitoring`.
+
+Verified:
+
+- Opik configuration logs to the `article-wave` project;
+- Comet downloads `articles-instruct-dataset`;
+- Opik creates `ArticleWaveArtifactTestDataset`;
+- `make evaluate-rag` completes with one sample when run sequentially.
+
+One-sample result:
+
+```text
+hallucination_metric: 0.0
+context_recall_metric: 0.54
+context_precision_metric: 0.60
+```
+
+Finding:
+
+- The first evaluation proves the LLM Twin-style evaluation loop works end to
+  end for Article Wave.
+- Scores are only a directional signal because the current dataset compares a
+  concise cited RAG answer against a longer source chunk used as the reference.
+- Running all 8 samples with Opik's default concurrency caused a native
+  `Error 139` crash locally, likely from threaded evaluation plus
+  SentenceTransformer/Torch on macOS. The evaluator is intentionally configured
+  with `task_threads=1` and `nb_samples=1` for the Phase 7 checkpoint.
+
+Status: **Done**.
 
 ## MVP Done
 
