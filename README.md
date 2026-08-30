@@ -151,14 +151,3 @@ Out of scope:
 | Phase 6: Behavior | Decide whether fine-tuning is useful for stable answer style. Current. |
 | Phase 7: Evaluation | Make retrieval and answer quality visible through test cases. |
 | Phase 8: Optional Refactor | Compare alternate indexing approaches only after the MVP works. |
-
-## Employer-Relevant Highlights
-
-This project demonstrates:
-
-- translating a reference architecture into a scoped product;
-- designing typed data models for AI pipelines;
-- building crawler abstractions and ingestion contracts;
-- preserving source provenance for trustworthy AI answers;
-- separating facts in retrieval from optional behavior tuning;
-- planning an MVP around RAG, citations, and evaluation instead of model hype.
